@@ -1,6 +1,6 @@
 from django.test import TestCase
-from ModelTesting.tests.testDaoModel import get_enable_categories_with_atleast_one_enabled_service, disassociate_category_from_service, update_the_details_of_service
 from ModelTesting.models import Category, Services
+from ModelTesting.tests.testDaoModel import ModelDao
 
 class ModelTest(TestCase):
 
@@ -102,7 +102,7 @@ class ModelTest(TestCase):
     
     def test_get_enable_categories_with_atleast_one_enabled_service(self):
         print("\nTesting for getting enable categories with atleast one enable service")
-        categories = get_enable_categories_with_atleast_one_enabled_service()
+        categories = ModelDao.get_enable_categories_with_atleast_one_enabled_service()
         try:
             self.assertIsNotNone(categories)
             category_count = categories.count()
@@ -117,7 +117,7 @@ class ModelTest(TestCase):
         service1 = self.service1
         service1.categories.add(category1)
         service_with_categories_before = service1.categories.all().count()
-        disassociate_category_from_service(service1, category1)
+        ModelDao.disassociate_category_from_service(service1, category1)
         service_with_categories_after = service1.categories.all().count()
         try:
             self.assertNotEqual(service_with_categories_after, service_with_categories_before)
@@ -142,11 +142,77 @@ class ModelTest(TestCase):
             print("Test passed !")
         except AssertionError as error:
             print(f'Test failed due to : {error}')
+    
+    def test_get_services_with_enable_categories(self):
+        print("\nTesting for all the services who have active categories in them")
+        try:
+            services = ModelDao.get_services_with_enable_categories()
+            self.assertIsNotNone(services)
+            print("Test passed !")
+        except AssertionError as error:
+            print(f'Test failed due to : {error}')
+    
+    def test_category_and_service_exists(self):
+        print("\nTesting category and services existance")
+        # Test Case 1: Service and Category do not exist
+        service_name = "test_create_service"
+        service_description = "Test description"
+        category_name = "nonexistent"
+    
+        try:
+            # Attempt to create a service with a nonexistent category
+            with self.assertRaises(Category.DoesNotExist):
+                category1 = Category.objects.create(name = category_name)
+            with self.assertRaises(Services.DoesNotExist):
+                service1 = Services.objects.create(name=service_name, description=service_description, category=Category.objects.get(name=category_name))
+            print("Testpassed!")
+        except AssertionError as error:
+            print(f"Test2 - Case 1 failed: {error}")
+
+        # Test Case 2: Service and Category both exist
+        try:
+            category1 = self.category1
+            service2 = self.service1
+
+            self.assertTrue(Services.objects.filter(name=service_name).exists())
+            self.assertTrue(Category.objects.filter(name=category1.name).exists())
+            self.assertEqual(service2.name, service_name)
+            self.assertEqual(service2.description, service_description)
+            print("Test passed!")
+        except AssertionError as error:
+            print(f"Test2 - Case 2 failed: {error}")
+
+    
+    def test_disassociate_category_from_service_doesnotexist(self):
+        print("\nTesting disassociate category from service")
+        try:
+            service1 = Services.objects.get(name = "something")
+            category1 = self.category1
+            ModelDao.disassociate_category_from_service(service1, category1)
+            print("Test1 passed !s")
+        except Services.DoesNotExist as error:
+            print(f"Error due to {error}")
         
+        try:
+            service1 = self.service1
+            category1 = Category.objects.get(name = "something")
+            ModelDao.disassociate_category_from_service(service1, category1)
+            print("Test2 passed !")
+        except Category.DoesNotExist as error:
+            print(f"Error due to {error}")
+
+        try:
+            service1 = Services.objects.get(name = "something")
+            category1 = Category.objects.get(name = "something")
+            ModelDao.disassociate_category_from_service(service1, category1)
+            print("Test3 passed !")
+        except Exception as e:
+            print(f'Error due to missing parameters ! {e}')
+        
+
 
     def tearDown(self):
         Category.objects.all().delete()
         Services.objects.all().delete()
 
 
-    
