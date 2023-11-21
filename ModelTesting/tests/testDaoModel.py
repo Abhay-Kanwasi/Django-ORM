@@ -24,7 +24,7 @@ class ModelDao:
 
     def get_services_with_enable_categories():
         services = Services.objects.filter(categories__is_active = True).distinct()
-        return services
+        return services 
 
     # Terminal Input 
     # service1 = Services.objects.get("Service1")
