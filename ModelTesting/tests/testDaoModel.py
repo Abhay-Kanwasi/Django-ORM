@@ -1,5 +1,6 @@
 from ModelTesting.models import Services, Category
 from django.db import models
+from django.db.models import Count
 
 class ModelDao:
     """
@@ -29,8 +30,17 @@ class ModelDao:
     # service1 = Services.objects.get("Service1")
     # update_the_details_of_service(service1)
 
-
-
+def get_all_categories_along_with_the_numbers_of_services_associated():
+    #  cateories_with_count = Category.objects.annotate(service_count = Count("services"))
+    #  print(cateories_with_count.values_list())
+    #  for category in cateories_with_count:
+    #     print(f"Category : {category.name} | Number of Services : {category.service_count}")
+    
+    categories = Category.objects.all()
+    print(categories.query)
+    for category in categories:
+        service_count_in_category = category.services.count()
+        print(f"Categories {category.name} | Associated Services {service_count_in_category}")
 
 
 
