@@ -1,5 +1,5 @@
 from django.test import TestCase
-from ModelTesting.models import Category, Services
+from ModelTesting.models import Category, Services, Pricing
 from ModelTesting.tests.testDaoModel import ModelDao
 
 class ModelTest(TestCase):
@@ -11,12 +11,48 @@ class ModelTest(TestCase):
         self.category4 = Category.objects.create(name="Category4", is_active = True)
         self.category5 = Category.objects.create(name="Category5", is_active = True)
         
-        self.service1 = Services.objects.create(name="Service1", description = "Service1", is_active = True)
-        self.service2 = Services.objects.create(name="Service2", description = "Service2", is_active = False)
-        self.service3 = Services.objects.create(name="Service3", description = "Service3", is_active = False)
-        self.service4 = Services.objects.create(name="Service4", description = "Service4", is_active = False)
-        self.service5 = Services.objects.create(name="Service5", description = "Service5", is_active = False)
+
+        self.pricing1 = Pricing.objects.create(price=2.0, is_active = True)
+        self.pricing2 = Pricing.objects.create(price=1.8, is_active = True)
+        self.pricing3 = Pricing.objects.create(price=4.6, is_active = False)
+        self.pricing4 = Pricing.objects.create(price=5.0, is_active = True)
+        self.pricing5 = Pricing.objects.create(price=5.0, is_active = False)
+
+        self.service1 = Services.objects.create(name="Service1", description = "Service1", is_active = True, pricing = self.pricing1)
+        self.service2 = Services.objects.create(name="Service2", description = "Service2", is_active = False, pricing = self.pricing2)
+        self.service3 = Services.objects.create(name="Service3", description = "Service3", is_active = False, pricing = self.pricing3)
+        self.service4 = Services.objects.create(name="Service4", description = "Service4", is_active = False, pricing = self.pricing4)
+        self.service5 = Services.objects.create(name="Service5", description = "Service5", is_active = False, pricing = self.pricing5)
+
+
+    def test_price_creation(self):
+        print("\n Testing the price creation")
+        self.assertEqual(self.service1.pricing, self.pricing1)
+        self.assertEqual(self.pricing1.services, self.service1)
+        print("Test passed !")
+
+    def test_price_update(self):
+        print("\nTesting price updation")
+        new_price = 21.8
+        self.pricing1.price = new_price
+        self.pricing1.save()
+        self.assertEqual(self.pricing1.price, new_price)
+        print("Test passed !")
     
+    def test_price_deletion(self):
+        print("\nTesting deletion of price")
+        pricing_id = self.pricing1.id
+        self.pricing1.delete()
+        with self.assertRaises(Pricing.DoesNotExist):
+            Pricing.objects.get(id=pricing_id)
+        print("Test passed !")
+
+    def test_price_query(self):
+        print("\nTesting price query")
+        queried_service = Services.objects.get(pricing__price=2.0)
+        self.assertEqual(queried_service, self.service1)
+        print("Test passed !")
+
     def test_create_category(self):
         print("\nTesting category creation")
         category1 = Category.objects.create(name="test_create_category")
