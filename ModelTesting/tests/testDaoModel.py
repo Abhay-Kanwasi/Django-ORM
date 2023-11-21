@@ -1,4 +1,4 @@
-from ModelTesting.models import Services, Category
+from ModelTesting.models import Services, Category, Pricing
 from django.db import models
 from django.db.models import Count
 
@@ -26,9 +26,18 @@ class ModelDao:
         This function will get all the services along with all the categories count that are associated with service.
 
     """
+
+    def get_all_services_with_active_prices():
+        services_with_active_price = Services.objects.filter(pricing__is_active=True)
+        return services_with_active_price
+
+    def get_all_active_prices():
+        enable_prices = Pricing.objects.filter(is_active=True)
+        return enable_prices
+
     def get_enable_categories_with_atleast_one_enabled_service():
-        categories = Category.objects.filter(is_active=True).filter(services__is_active=True).distinct()
-        return categories
+        enable_categories = Category.objects.filter(is_active=True).filter(services__is_active=True).distinct()
+        return enable_categories
 
     def disassociate_category_from_service(service_object, category_object):
         service_object.categories.remove(category_object)

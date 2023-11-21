@@ -1,6 +1,8 @@
 from django.test import TestCase
 from ModelTesting.models import Category, Services, Pricing
 from ModelTesting.tests.testDaoModel import ModelDao
+from django.db.utils import IntegrityError
+from django.db import transaction
 
 class ModelTest(TestCase):
 
@@ -25,6 +27,22 @@ class ModelTest(TestCase):
         self.service5 = Services.objects.create(name="Service5", description = "Service5", is_active = False, pricing = self.pricing5)
 
 
+    def test_get_all_active_prices(self):
+        print("\nTesting all active prices")
+        enable_prices = ModelDao.get_all_active_prices().count()
+        enable_setup_prices = Pricing.objects.filter(is_active=True).count()
+        self.assertIsNotNone(enable_prices)
+        self.assertEqual(enable_prices, enable_setup_prices)
+        print("Test passed !")
+    
+    def test_get_all_services_with_active_prices(self):
+        print("\nTesting all services which have active prices")
+        services = ModelDao.get_all_services_with_active_prices().count()
+        setup_services = Services.objects.filter(pricing__is_active=True).count()
+        self.assertIsNotNone(services)
+        self.assertEqual(services, setup_services)
+        print("Test passed !")
+
     def test_price_creation(self):
         print("\n Testing the price creation")
         self.assertEqual(self.service1.pricing, self.pricing1)
@@ -46,6 +64,12 @@ class ModelTest(TestCase):
         with self.assertRaises(Pricing.DoesNotExist):
             Pricing.objects.get(id=pricing_id)
         print("Test passed !")
+
+    def test_unique_price_for_each_service(self):
+        print("\nTesting unique price for each service")
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                service = Services.objects.create(name = "Some Service", pricing= self.pricing1)
 
     def test_price_query(self):
         print("\nTesting price query")
