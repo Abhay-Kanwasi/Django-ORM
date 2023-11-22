@@ -1,6 +1,6 @@
 from django.test import TestCase
 from ModelTesting.models import Category, Services, Pricing, Form
-from ModelTesting.tests.testDaoModel import ModelDao
+from ModelTesting.Dao import ModelDao
 from django.db.utils import IntegrityError
 from django.db import transaction
                 
