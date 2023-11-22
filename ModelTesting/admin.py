@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Services, Pricing
+from .models import Category, Services, Pricing, Form
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -8,9 +8,13 @@ class CategoryAdmin(admin.ModelAdmin):
 class PricingAdmin(admin.ModelAdmin):
     list_display = ['id', 'price', 'is_active']
 
+class FormAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'username', 'password']
+
 class ServicesAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'description', 'is_active']
 
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Services, ServicesAdmin)
 admin.site.register(Pricing, PricingAdmin)
+admin.site.register(Form, FormAdmin)
