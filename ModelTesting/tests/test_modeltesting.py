@@ -1,9 +1,9 @@
 from django.test import TestCase
-from ModelTesting.models import Category, Services, Pricing
+from ModelTesting.models import Category, Services, Pricing, Form
 from ModelTesting.tests.testDaoModel import ModelDao
 from django.db.utils import IntegrityError
 from django.db import transaction
-
+                
 class ModelTest(TestCase):
 
     def setUp(self):
@@ -13,18 +13,74 @@ class ModelTest(TestCase):
         self.category4 = Category.objects.create(name="Category4", is_active = True)
         self.category5 = Category.objects.create(name="Category5", is_active = True)
         
-
         self.pricing1 = Pricing.objects.create(price=2.0, is_active = True)
         self.pricing2 = Pricing.objects.create(price=1.8, is_active = True)
         self.pricing3 = Pricing.objects.create(price=4.6, is_active = False)
         self.pricing4 = Pricing.objects.create(price=5.0, is_active = True)
         self.pricing5 = Pricing.objects.create(price=5.0, is_active = False)
 
+        self.form1 = Form.objects.create(name = "Form1", username = "Form1User", password = "Form1Password")
+        self.form2 = Form.objects.create(name = "Form2", username = "Form2User", password = "Form2Password")
+        self.form3 = Form.objects.create(name = "Form3", username = "Form3User", password = "Form3Password")
+        self.form4 = Form.objects.create(name = "Form4", username = "Form4User", password = "Form4Password")
+        self.form5 = Form.objects.create(name = "Form5", username = "Form5User", password = "Form5Password")
+
         self.service1 = Services.objects.create(name="Service1", description = "Service1", is_active = True, pricing = self.pricing1)
         self.service2 = Services.objects.create(name="Service2", description = "Service2", is_active = False, pricing = self.pricing2)
         self.service3 = Services.objects.create(name="Service3", description = "Service3", is_active = False, pricing = self.pricing3)
         self.service4 = Services.objects.create(name="Service4", description = "Service4", is_active = False, pricing = self.pricing4)
         self.service5 = Services.objects.create(name="Service5", description = "Service5", is_active = False, pricing = self.pricing5)
+
+    
+    def test_add_form1_form2_to_service1(self):
+        print("\nTesting addition of form1 and form2 into services")
+        self.service1.form.add(self.form1, self.form2)
+        self.assertTrue(self.service1.form.filter(name="Form1").exists())
+        self.assertTrue(self.service1.form.filter(name="Form2").exists())
+        self.assertEqual(1, self.service1.form.filter(name="Form1").count())
+        self.assertEqual(1, self.service1.form.filter(name="Form2").count())
+        print("Test passed!")
+
+    def test_disassociate_form1_from_services(self):
+        print("\nTesting disassociation of form1 from service1")
+        self.service1.form.add(self.form1, self.form2)
+        form1 = self.form1
+        self.service1.form.remove(form1)
+        with self.assertRaises(Form.DoesNotExist):
+            self.service1.form.get(name = form1.name)
+        print("Test passed !")
+   
+    def test_create_form(self):
+        print("\nTesting creation of form")
+        self_form_name = self.form1.name
+        self_form_username = self.form1.username
+        self_form_password = self.form1.password
+        form_name = Form.objects.create(name="Form1", username = "Form1User", password = "Form1Password")
+        self.assertEqual(self_form_name, form_name.name)
+        self.assertEqual(self_form_username, form_name.username)
+        self.assertEqual(self_form_password, form_name.password)
+        print("Test passed !")
+    
+    def test_update_form(self):
+        print("\nTesting updation of form")
+        name = "New Name"
+        username = "New UserName"
+        password = "New Password"
+        self.form1.name = name
+        self.form1.username = username
+        self.form1.password = password
+        self.assertEqual(name, self.form1.name)
+        self.assertEqual(username, self.form1.username)
+        self.assertEqual(password, self.form1.password)
+        print("Test passed !")
+
+    def test_delete_form(self):
+        print("\nTesting deletion of form")
+        form_id = self.form1.id
+        self.form1.delete()
+        with self.assertRaises(Form.DoesNotExist):
+            Form.objects.get(id=form_id)
+        print("Test passed !")
 
     def test_get_all_active_prices(self):
         print("\nTesting all active prices")
@@ -69,6 +125,7 @@ class ModelTest(TestCase):
         with transaction.atomic():
             with self.assertRaises(IntegrityError):
                 service = Services.objects.create(name = "Some Service", pricing= self.pricing1)
+        print("Test passed !")
 
     def test_price_query(self):
         print("\nTesting price query")
@@ -176,7 +233,6 @@ class ModelTest(TestCase):
         self.assertEqual(self.service1.is_active, False) 
         print("Test passed !")
 
-    
     def test_get_services_with_enable_categories(self):
         print("\nTesting for all the services who have active categories in them")
         services = ModelDao.get_services_with_enable_categories()

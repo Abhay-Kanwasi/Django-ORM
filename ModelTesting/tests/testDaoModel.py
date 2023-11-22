@@ -1,9 +1,11 @@
-from ModelTesting.models import Services, Category, Pricing
+from ModelTesting.models import Services, Category, Pricing, Form
 from django.db import models
 from django.db.models import Count
 
 class ModelDao:
     """
+        IN THIS CLASS ALL THE FUNCTIONS FOR TESTING ARE MADE
+        
         - get_enable_categories_with_atleast_one_enabled_service()
         This function will not take any parameters. It will give    you all enable categories with atleast one enable service.
 
@@ -43,9 +45,24 @@ class ModelDao:
         service_object.categories.remove(category_object)
         return service_object
 
+    def disassociate_form_from_service(service_object, form_object):
+        service_object.form.remove(form_object)
+        return service_object
+
+
     def get_services_with_enable_categories():
         services = Services.objects.filter(categories__is_active = True).distinct()
         return services 
+
+    def get_all_forms_along_with_the_number_of_services_associated():
+        forms = Form.objects.all()
+        count = 0
+        for form in forms:
+            service_count_in_forms = form.services.count()
+            print(f"Forms {form.name} | Associated Services {service_count_in_forms}")
+            if service_count_in_forms != 0:
+                count += 1
+        return count
 
     def get_all_categories_along_with_the_numbers_of_services_associated():
         categories = Category.objects.all()
@@ -56,6 +73,17 @@ class ModelDao:
             if service_count_in_categories != 0:
                 count += 1
         return count
+
+    def get_all_services_along_with_the_number_of_form_associated():
+        services = Services.objects.all()
+        count = 0
+        for service in services:
+            form_count_in_services = service.form.count()
+            print(f"Service {service.name} | Associated Forms {form_count_in_services}")
+            if form_count_in_services != 0:
+                count += 1
+        return count
+
 
     def get_all_services_along_with_the_number_of_categories_associated():
         services = Services.objects.all()
