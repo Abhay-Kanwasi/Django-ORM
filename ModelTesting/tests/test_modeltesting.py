@@ -26,7 +26,6 @@ class ModelTest(TestCase):
         self.service4 = Services.objects.create(name="Service4", description = "Service4", is_active = False, pricing = self.pricing4)
         self.service5 = Services.objects.create(name="Service5", description = "Service5", is_active = False, pricing = self.pricing5)
 
-
     def test_get_all_active_prices(self):
         print("\nTesting all active prices")
         enable_prices = ModelDao.get_all_active_prices().count()
