@@ -31,7 +31,6 @@ class ModelTest(TestCase):
         self.service4 = Services.objects.create(name="Service4", description = "Service4", is_active = False, pricing = self.pricing4)
         self.service5 = Services.objects.create(name="Service5", description = "Service5", is_active = False, pricing = self.pricing5)
 
-    
     def test_add_form1_form2_to_service1(self):
         print("\nTesting addition of form1 and form2 into services")
         self.service1.form.add(self.form1, self.form2)
@@ -168,6 +167,12 @@ class ModelTest(TestCase):
         self.assertFalse(service1.categories.filter(name="Category1").exists())
         print("Test passed !")
 
+    def test_disassociate_form_from_service_by_name(self):
+        service_name = "bla"
+        form_name = "bla"
+        ModelDao.disassociate_form_from_service_by_name(service_name, form_name)
+
+
     def test_add_category_2_3_to_service_with_categories_1_2(self):
         print("\nTesting addition of category2 and category3 to service1 with categories 1 and 2")
         self.service1.categories.add(self.category2, self.category3)
@@ -264,22 +269,6 @@ class ModelTest(TestCase):
         self.assertEqual(category1.name, category_name)
         self.assertEqual(service2.description, service_description)
         print("Test2 passed!")
-
-    def test_get_all_categories_along_with_the_numbers_of_services_associated(self):
-        print("\nTesting all categories getting the associated services count")
-        self.service1.categories.add(self.category1, self.category2, self.category3)
-        count = ModelDao.get_all_categories_along_with_the_numbers_of_services_associated()
-        self.assertEqual(3, count)
-        print("Test passed !")
-
-    def test_get_all_services_along_with_the_number_of_categories_associated(self):
-        print("\nTesting all services getting the associated categories count")
-        self.service1.categories.add(self.category1, self.category3)
-        self.service2.categories.add(self.category1, self.category5, self.category3)
-        self.service4.categories.add(self.category3, self.category4, self.category1, self.category5)
-        count = ModelDao.get_all_services_along_with_the_number_of_categories_associated()
-        self.assertEqual(3, count)
-        print("Test passed !")
     
     def tearDown(self):
         Category.objects.all().delete()

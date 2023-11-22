@@ -1,6 +1,11 @@
 from django.contrib import admin
-from .models import Category, Services, Pricing, Form
+from .models import Category, Services, Pricing, Form, Tasks, Workflow
 
+class TasksAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'task_details']
+
+class WorkflowAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'details']
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'is_active']

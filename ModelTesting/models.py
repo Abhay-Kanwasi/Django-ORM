@@ -22,6 +22,21 @@ class Pricing(models.Model):
     def __str__(self):
         return str(self.price)
 
+class Workflow(models.Model):
+    name = models.CharField(max_length=14)
+    details = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.details
+
+class Tasks(models.Model):
+    name = models.CharField(max_length=24)
+    workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE, related_name='tasks')
+    task_details = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
 class Services(models.Model):
     name = models.CharField(max_length=30)
     description = models.CharField(max_length=30)

@@ -5,7 +5,7 @@ from django.db.models import Count
 class ModelDao:
     """
         IN THIS CLASS ALL THE FUNCTIONS FOR TESTING ARE MADE
-        
+
         - get_enable_categories_with_atleast_one_enabled_service()
         This function will not take any parameters. It will give    you all enable categories with atleast one enable service.
 
@@ -50,47 +50,74 @@ class ModelDao:
         return service_object
 
 
+    def disassociate_form_from_service_by_name(service_name, form_name):
+        service_object = Services.objects.get(name=service_name)
+        form_object = Form.objects.get(name=form_name)
+        service_object.form.remove(form_object)
+        return service_object
+
+
+    def disassociate_form_from_service_by_id(service_id, form_id):
+        service_object = Services.objects.get(id=service_id)
+        form_object = Form.objects.get(name=form_id)
+        service_object.form.remove(form_object)
+        return service_object
+
     def get_services_with_enable_categories():
         services = Services.objects.filter(categories__is_active = True).distinct()
         return services 
 
     def get_all_forms_along_with_the_number_of_services_associated():
         forms = Form.objects.all()
-        count = 0
+        list_of_forms = []
         for form in forms:
-            service_count_in_forms = form.services.count()
-            print(f"Forms {form.name} | Associated Services {service_count_in_forms}")
-            if service_count_in_forms != 0:
-                count += 1
-        return count
+            form_dict = dict()
+            form_dict["name"] = form.name
+            form_dict["username"] = form.username
+            form_dict["password"] = form.password
+            form_dict["services_count"] = form.services.count()
+            list_of_forms.append(form_dict)
+        return list_of_forms
 
     def get_all_categories_along_with_the_numbers_of_services_associated():
         categories = Category.objects.all()
-        count = 0
+        list_of_categories = []
         for category in categories:
-            service_count_in_categories = category.services.count()
-            print(f"Categories {category.name} | Associated Services {service_count_in_categories}")
-            if service_count_in_categories != 0:
-                count += 1
-        return count
+            category_dict = dict()
+            category_dict["name"] = category.name
+            category_dict["is_active"] = category.is_active
+            category_dict["services_count"] = category.services.count()
+            list_of_categories.append(category_dict)
+        return list_of_categories
 
     def get_all_services_along_with_the_number_of_form_associated():
+        """
+        @Returns a list containing service details and the number of forms associated with the service
+        For example:
+        [
+            {"name": "service name1": "description": "Service name1 description", "is_active": True, "CountForms": 10  },
+            {"name": "service name2": "description": "Service name2 description", "is_active": True, "CountForms": 0  },
+        ]
+        """
         services = Services.objects.all()
-        count = 0
+        list_of_services = []
         for service in services:
-            form_count_in_services = service.form.count()
-            print(f"Service {service.name} | Associated Forms {form_count_in_services}")
-            if form_count_in_services != 0:
-                count += 1
-        return count
-
+            services_dict = dict()
+            services_dict["name"] = service.name
+            services_dict["description"] = service.description
+            services_dict["is_active"] = service.is_active
+            services_dict["form_count"] = service.form.count()
+            list_of_services.append(services_dict)
+        return list_of_services        
 
     def get_all_services_along_with_the_number_of_categories_associated():
         services = Services.objects.all()
-        count = 0
+        list_of_services = []
         for service in services:
-            category_count_in_services = service.categories.count()
-            print(f"Service {service.name} | Associated Categories {category_count_in_services}")
-            if category_count_in_services != 0:
-                count += 1
-        return count
+            services_dict = dict()
+            services_dict["name"] = service.name
+            services_dict["description"] = service.description
+            services_dict["is_active"] = service.is_active
+            services_dict["category_count"] = service.categories.count()
+            list_of_services.append(services_dict)
+        return list_of_services
