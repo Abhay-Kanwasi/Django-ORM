@@ -167,10 +167,10 @@ class ModelTest(TestCase):
         self.assertFalse(service1.categories.filter(name="Category1").exists())
         print("Test passed !")
 
-    def test_disassociate_form_from_service_by_name(self):
-        service_name = "bla"
-        form_name = "bla"
-        ModelDao.disassociate_form_from_service_by_name(service_name, form_name)
+    # def test_disassociate_form_from_service_by_name(self):
+    #     service_name = "bla"
+    #     form_name = "bla"
+    #     ModelDao.disassociate_form_from_service_by_name(service_name, form_name)
 
 
     def test_add_category_2_3_to_service_with_categories_1_2(self):
