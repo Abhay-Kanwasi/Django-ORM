@@ -1,6 +1,7 @@
-from ModelTesting.models import Services, Category, Pricing, Form
+from .models import Services, Category, Pricing, Form
 from django.db import models
-from django.db.models import Count
+import json
+
 
 class ModelDao:
     """
@@ -43,7 +44,7 @@ class ModelDao:
 
     def disassociate_category_from_service(service_object, category_object):
         service_object.categories.remove(category_object)
-        return service_object
+        return service_object    
 
     def disassociate_form_from_service(service_object, form_object):
         service_object.form.remove(form_object)
@@ -69,55 +70,53 @@ class ModelDao:
 
     def get_all_forms_along_with_the_number_of_services_associated():
         forms = Form.objects.all()
-        list_of_forms = []
+        form_dict = {}
         for form in forms:
-            form_dict = dict()
-            form_dict["name"] = form.name
-            form_dict["username"] = form.username
-            form_dict["password"] = form.password
-            form_dict["services_count"] = form.services.count()
-            list_of_forms.append(form_dict)
-        return list_of_forms
+            form_info = {
+                "name": form.name,
+                "username": form.username,
+                "password": form.password,
+                "services_count": form.services.count(),
+            }
+            form_dict[form.name] = form_info
+        return form_dict
+
 
     def get_all_categories_along_with_the_numbers_of_services_associated():
         categories = Category.objects.all()
-        list_of_categories = []
+        list_of_categories = {}
         for category in categories:
-            category_dict = dict()
-            category_dict["name"] = category.name
-            category_dict["is_active"] = category.is_active
-            category_dict["services_count"] = category.services.count()
-            list_of_categories.append(category_dict)
+            category_info = {
+            "name" : category.name,
+            "is_active" : category.is_active,
+            "services_count" : category.services.count()
+            }
+            list_of_categories[category.name] = category_info
         return list_of_categories
 
     def get_all_services_along_with_the_number_of_form_associated():
-        """
-        @Returns a list containing service details and the number of forms associated with the service
-        For example:
-        [
-            {"name": "service name1": "description": "Service name1 description", "is_active": True, "CountForms": 10  },
-            {"name": "service name2": "description": "Service name2 description", "is_active": True, "CountForms": 0  },
-        ]
-        """
         services = Services.objects.all()
-        list_of_services = []
+        list_of_services = {}
         for service in services:
-            services_dict = dict()
-            services_dict["name"] = service.name
-            services_dict["description"] = service.description
-            services_dict["is_active"] = service.is_active
-            services_dict["form_count"] = service.form.count()
-            list_of_services.append(services_dict)
+            service_info = {
+                "name" : service.name,
+                "description" : service.description,
+                "is_active" : service.is_active,
+                "form_count" : service.form.count()
+            }
+            list_of_services[service.name] = service_info
         return list_of_services        
 
     def get_all_services_along_with_the_number_of_categories_associated():
         services = Services.objects.all()
-        list_of_services = []
+        list_of_services = {}
         for service in services:
-            services_dict = dict()
-            services_dict["name"] = service.name
-            services_dict["description"] = service.description
-            services_dict["is_active"] = service.is_active
-            services_dict["category_count"] = service.categories.count()
-            list_of_services.append(services_dict)
+            service_info = {
+            "name" : service.name,
+            "description" : service.description,
+            "is_active" : service.is_active,
+            "category_count" : service.categories.count()
+            }
+            list_of_services[service.name] = service_info
         return list_of_services
+    
